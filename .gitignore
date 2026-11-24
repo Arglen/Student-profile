@@ -1,0 +1,7 @@
+borrowhood_env/
+borrowhood_pkgs/
+db.sqlite3
+__pycache__/
+*.pyc
+*.pyo
+.env
