@@ -85,16 +85,27 @@ def home_view(request):
 @login_required
 def student_list_view(request):
     query = request.GET.get('q', '').strip()
+    selected_pk = request.GET.get('selected')
     students = Student.objects.all()
     if query:
-        students = students.filter(
-            last_name__icontains=query
-        ) | students.filter(
-            first_name__icontains=query
-        ) | students.filter(
-            student_id__icontains=query
+        students = (
+            students.filter(last_name__icontains=query)
+            | students.filter(first_name__icontains=query)
+            | students.filter(student_id__icontains=query)
         )
-    return render(request, 'accounts/student_list.html', {'students': students, 'query': query})
+    selected = None
+    if selected_pk:
+        try:
+            selected = Student.objects.get(pk=selected_pk)
+        except Student.DoesNotExist:
+            pass
+    if selected is None and students.exists():
+        selected = students.first()
+    return render(request, 'accounts/student_list.html', {
+        'students': students,
+        'query': query,
+        'selected': selected,
+    })
 
 
 @login_required
