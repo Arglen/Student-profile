@@ -1,0 +1,271 @@
+{% extends 'accounts/enrollment_base.html' %}
+{% block title %}Student Profiles — Enrollment System{% endblock %}
+{% block topbar_title %}Student profiles{% endblock %}
+{% block nav_students %}active{% endblock %}
+
+{% block content %}
+
+<!-- Page heading -->
+<div style="margin-bottom:20px;">
+  <h1 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;">Student profiles<span style="color:#3b5fc0">.</span></h1>
+  <p style="color:#888;font-size:0.88rem;margin-top:4px;">A focused view of your class, one student at a time.</p>
+</div>
+
+<!-- Stat cards -->
+{% with total=students.count %}
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-label">Total students <span class="stat-delta">+8.4%</span></div>
+    <div class="stat-value" id="roster-count-val">{{ total }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Enrolled <span class="stat-delta">+4.2%</span></div>
+    <div class="stat-value">{{ total }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">For review <span class="stat-delta neutral">This week</span></div>
+    <div class="stat-value">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">School year <span class="stat-delta neutral">Active</span></div>
+    <div class="stat-value" style="font-size:1.3rem;">2025–26</div>
+  </div>
+</div>
+{% endwith %}
+
+<!-- Split panel -->
+<div class="split-panel">
+
+  <!-- ── LEFT: Roster ── -->
+  <div class="roster-card">
+    <div class="roster-header">
+      <div>
+        <span class="roster-title">Class roster</span>
+        <span class="roster-count">{{ students.count }}</span>
+      </div>
+      <a href="/admin/accounts/student/add/"
+         style="font-size:0.82rem;font-weight:700;color:#fff;background:#3b5fc0;padding:7px 14px;border-radius:8px;text-decoration:none;">
+        + Add student
+      </a>
+    </div>
+    <p class="roster-hint">Click a student to view their full record.</p>
+
+    <form class="roster-search" method="get" action="{% url 'student_list' %}">
+      {% if selected %}<input type="hidden" name="selected" value="{{ selected.pk }}">{% endif %}
+      <input type="text" name="q" value="{{ query }}" placeholder="Search by name or ID…">
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="roster-filters">
+      <a class="filter-chip active" href="{% url 'student_list' %}{% if query %}?q={{ query }}{% endif %}">All students</a>
+    </div>
+
+    <div class="roster-list">
+      {% for s in students %}
+      {% with colors="av-blue av-teal av-green av-orange av-red av-purple av-indigo av-pink" %}
+      {% with idx=forloop.counter0|add:0 %}
+      <a class="roster-item {% if selected and selected.pk == s.pk %}selected{% endif %}"
+         href="?{% if query %}q={{ query }}&{% endif %}selected={{ s.pk }}">
+        <div class="r-avatar {% cycle 'av-blue' 'av-teal' 'av-green' 'av-orange' 'av-red' 'av-purple' 'av-indigo' 'av-pink' %}">
+          {{ s.first_name|slice:":1" }}{{ s.last_name|slice:":1" }}
+        </div>
+        <div class="r-info">
+          <div class="r-name">{{ s.full_name }}</div>
+          <div class="r-sub">{{ s.student_id }}{% if s.section %} · {{ s.section }}{% endif %}</div>
+        </div>
+        <span class="r-badge badge-enrolled">Enrolled</span>
+      </a>
+      {% endwith %}
+      {% endwith %}
+      {% empty %}
+      <div style="padding:40px 20px;text-align:center;color:#bbb;font-size:0.9rem;">
+        {% if query %}No results for "{{ query }}".{% else %}No students yet. <a href="/admin/accounts/student/add/" style="color:#3b5fc0;font-weight:600;">Add one</a>.{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="roster-footer">
+      <span>Showing {{ students.count }} student{{ students.count|pluralize }}</span>
+      <span><span class="live-dot"></span>Live data</span>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Profile Panel ── -->
+  <div class="profile-panel">
+    {% if selected %}
+    {% with s=selected %}
+
+    <div class="profile-panel-header">
+      <div class="profile-panel-label">Student Profile</div>
+      <div class="p-actions">
+        <button class="btn-export">⬆ Export</button>
+      </div>
+    </div>
+
+    <div class="profile-hero">
+      <div class="p-avatar {% cycle 'av-blue' 'av-teal' 'av-green' 'av-orange' 'av-red' 'av-purple' 'av-indigo' 'av-pink' %}">
+        {{ s.first_name|slice:":1" }}{{ s.last_name|slice:":1" }}
+        <div class="p-online"></div>
+      </div>
+      <div>
+        <div class="p-name">{{ s.full_name }}</div>
+        <div class="p-meta">
+          {{ s.student_id }}{% if s.year_level %} &nbsp;·&nbsp; {{ s.year_level }}{% endif %}{% if s.section %} — {{ s.section }}{% endif %}
+        </div>
+        <div class="p-status-row">
+          <span class="p-status badge-enrolled">● Enrolled</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+      <a class="tab-btn active" href="#" onclick="showTab('personal',this);return false;">Personal info</a>
+      <a class="tab-btn" href="#" onclick="showTab('background',this);return false;">Background</a>
+      <a class="tab-btn" href="#" onclick="showTab('enrollment',this);return false;">Enrollment</a>
+    </div>
+
+    <!-- Tab: Personal info -->
+    <div class="tab-pane active" id="tab-personal">
+      <div class="info-section">
+        <div class="info-section-num">01</div>
+        <div class="info-section-title">Personal information</div>
+        <div class="info-section-sub">Basic details and contact information</div>
+        <div class="info-grid">
+          <div class="info-field">
+            <label>First name</label>
+            <p>{{ s.first_name|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Middle name</label>
+            <p>{{ s.middle_name|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Last name</label>
+            <p>{{ s.last_name|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Date of birth</label>
+            <p>{% if s.date_of_birth %}{{ s.date_of_birth|date:"F j, Y" }}{% else %}—{% endif %}</p>
+          </div>
+          <div class="info-field">
+            <label>Gender</label>
+            <p>{{ s.gender|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Civil status</label>
+            <p>{{ s.civil_status|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Phone number</label>
+            <p>{{ s.phone|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Email address</label>
+            <p>{% if s.email %}<a href="mailto:{{ s.email }}">{{ s.email }}</a>{% else %}—{% endif %}</p>
+          </div>
+          <div class="info-field full">
+            <label>Home address</label>
+            <p>{{ s.address|default:"—" }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-section-num">02</div>
+        <div class="info-section-title">Guardian contact</div>
+        <div class="info-section-sub">Primary contact for this student</div>
+        {% if s.guardian_name %}
+        <div class="guardian-card">
+          <div class="g-avatar">{{ s.guardian_name|slice:":1"|upper }}</div>
+          <div class="g-info">
+            <div class="g-name">{{ s.guardian_name }}</div>
+            <div class="g-contact">{{ s.guardian_contact|default:"No contact listed" }}</div>
+          </div>
+          {% if s.guardian_contact %}<button class="g-btn">Contact ›</button>{% endif %}
+        </div>
+        {% else %}
+        <p style="color:#bbb;font-size:0.9rem;">No guardian on record.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Tab: Background -->
+    <div class="tab-pane" id="tab-background">
+      <div class="info-section">
+        <div class="info-section-num">01</div>
+        <div class="info-section-title">Academic background</div>
+        <div class="info-section-sub">Prior schooling and program information</div>
+        <div class="info-grid">
+          <div class="info-field">
+            <label>Course / Program</label>
+            <p>{{ s.course|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Year level</label>
+            <p>{{ s.year_level|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>Section</label>
+            <p>{{ s.section|default:"—" }}</p>
+          </div>
+          <div class="info-field">
+            <label>School year</label>
+            <p>{{ s.school_year|default:"—" }}</p>
+          </div>
+          <div class="info-field full">
+            <label>Previous school</label>
+            <p>{{ s.previous_school|default:"—" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Enrollment -->
+    <div class="tab-pane" id="tab-enrollment">
+      <div class="info-section">
+        <div class="info-section-num">01</div>
+        <div class="info-section-title">Enrollment details</div>
+        <div class="info-section-sub">Registration and status records</div>
+        <div class="info-grid">
+          <div class="info-field">
+            <label>Student ID</label>
+            <p>{{ s.student_id }}</p>
+          </div>
+          <div class="info-field">
+            <label>Date enrolled</label>
+            <p>{% if s.date_enrolled %}{{ s.date_enrolled|date:"F j, Y" }}{% else %}—{% endif %}</p>
+          </div>
+          <div class="info-field">
+            <label>Status</label>
+            <p><span class="r-badge badge-enrolled" style="display:inline-block;">Enrolled</span></p>
+          </div>
+          <div class="info-field">
+            <label>School year</label>
+            <p>{{ s.school_year|default:"—" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endwith %}
+    {% else %}
+    <div class="no-selection">
+      <div class="ns-icon">👈</div>
+      <p>Select a student from the roster to view their profile.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div><!-- /split-panel -->
+
+<script>
+function showTab(name, el) {
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+
+{% endblock %}

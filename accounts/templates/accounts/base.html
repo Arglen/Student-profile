@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}borrowhood{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 40px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .nav-logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; color: #111; text-decoration: none; }
+    .nav-tagline { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #888; }
+    .nav-links { display: flex; gap: 6px; align-items: center; font-size: 0.9rem; }
+    .nav-links a { color: #111; text-decoration: none; }
+    .nav-links span { color: #bbb; }
+
+    /* ── MAIN LAYOUT ── */
+    .page-wrap {
+      display: flex;
+      flex: 1;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      width: 38%;
+      background: #f4f4f2;
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .panel-step {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 20px;
+    }
+    .panel-headline {
+      font-size: 2.6rem;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .panel-sub {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+    .panel-card {
+      border: 1px solid #d4d4d0;
+      border-radius: 4px;
+      padding: 20px 22px;
+      background: #fff;
+      margin-bottom: 36px;
+    }
+    .panel-card-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e0e0dc;
+      margin-bottom: 14px;
+    }
+    .panel-card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .panel-card-meta {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e0dc;
+      margin-bottom: 14px;
+    }
+    .panel-card-row {
+      display: flex;
+      gap: 32px;
+      font-size: 0.85rem;
+    }
+    .panel-card-row dt { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; margin-bottom: 2px; }
+    .panel-card-row dd { font-weight: 600; }
+
+    /* step list */
+    .step-list { list-style: none; margin-bottom: 36px; }
+    .step-list li { display: flex; gap: 18px; margin-bottom: 20px; align-items: flex-start; }
+    .step-num { font-size: 0.75rem; font-weight: 700; color: #bbb; min-width: 24px; padding-top: 2px; }
+    .step-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+    .step-desc { font-size: 0.85rem; color: #666; }
+
+    .panel-slogan {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      flex: 1;
+      padding: 64px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .form-section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 10px;
+    }
+    .form-heading {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .form-subheading {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 32px;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    .field { margin-bottom: 20px; }
+    .field label { display: block; font-size: 0.88rem; font-weight: 500; margin-bottom: 6px; }
+    .field input[type="text"],
+    .field input[type="email"],
+    .field input[type="password"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d4d4d0;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s;
+      background: #fff;
+    }
+    .field input:focus { border-color: #111; }
+    .field input::placeholder { color: #bbb; }
+
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 60px; }
+    .show-btn {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; color: #111; padding: 0;
+    }
+
+    .field-hint { font-size: 0.78rem; color: #888; margin-top: 4px; }
+
+    .row-between {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 22px;
+    }
+    .check-label { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; cursor: pointer; }
+    .check-label input[type="checkbox"] { width: 16px; height: 16px; }
+    .forgot { font-size: 0.88rem; font-weight: 600; color: #111; text-decoration: none; }
+    .forgot:hover { text-decoration: underline; }
+
+    .btn-primary {
+      display: block; width: 100%;
+      padding: 16px;
+      background: #111; color: #fff;
+      border: none; border-radius: 4px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.01em;
+      text-align: center; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #333; }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; color: #bbb; font-size: 0.82rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #e0e0dc;
+    }
+
+    .btn-secondary {
+      display: block; width: 100%;
+      padding: 15px;
+      background: #fff; color: #111;
+      border: 1px solid #d4d4d0; border-radius: 4px;
+      font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; text-align: center; text-decoration: none;
+      transition: border-color 0.15s;
+    }
+    .btn-secondary:hover { border-color: #111; }
+
+    .form-footer { margin-top: 22px; text-align: center; font-size: 0.9rem; color: #666; }
+    .form-footer a { font-weight: 600; color: #111; text-decoration: none; }
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* messages */
+    .messages { margin-bottom: 18px; }
+    .message-error {
+      background: #fff0f0; border: 1px solid #fcc; border-radius: 4px;
+      padding: 10px 14px; font-size: 0.88rem; color: #c00; margin-bottom: 8px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 40px; border-top: 1px solid #e8e8e8;
+      font-size: 0.8rem; color: #888;
+    }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a { color: #888; text-decoration: none; }
+    .footer-links a:hover { color: #111; }
+    .footer-sep { color: #ccc; }
+
+    @media (max-width: 768px) {
+      .page-wrap { flex-direction: column; }
+      .left-panel { width: 100%; }
+      .right-panel { padding: 40px 24px; }
+      nav { padding: 16px 20px; }
+      footer { padding: 14px 20px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="{% url 'home' %}">borrowhood</a>
+  <span class="nav-tagline">The Neighborhood Tool Library</span>
+  <div class="nav-links">
+    <a href="#">How it works</a>
+    <span>/</span>
+    <a href="#">Get help</a>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<footer>
+  <span>A little trust goes a long way.</span>
+  <div class="footer-links">
+    <a href="#">Community guidelines</a>
+    <span class="footer-sep">·</span>
+    <a href="#">Privacy</a>
+    <span class="footer-sep">·</span>
+    <a href="#">Terms</a>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.show-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const inp = btn.previousElementSibling;
+      if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+      else { inp.type = 'password'; btn.textContent = 'Show'; }
+    });
+  });
+</script>
+</body>
+</html>
