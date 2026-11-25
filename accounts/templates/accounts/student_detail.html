@@ -1,0 +1,112 @@
+{% extends 'accounts/enrollment_base.html' %}
+{% block title %}{{ student.full_name }} — Profile{% endblock %}
+
+{% block content %}
+<div class="enroll-wrap">
+
+  <a class="back-link" href="{% url 'student_list' %}">← Back to Student List</a>
+
+  <div class="profile-hero">
+    <div class="profile-avatar-lg">{{ student.first_name.0 }}{{ student.last_name.0 }}</div>
+    <div>
+      <h1 class="profile-name">{{ student.full_name }}</h1>
+      <p class="profile-meta">{{ student.student_id }} &nbsp;·&nbsp; {{ student.course|default:"No course" }} &nbsp;·&nbsp; {{ student.year_level|default:"" }} {{ student.section|default:"" }}</p>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+
+    <!-- Personal Information -->
+    <section class="info-card">
+      <h2 class="card-title">
+        <span class="card-icon">👤</span> Personal Information
+      </h2>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>Full Name</dt>
+          <dd>{{ student.full_name }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Student ID</dt>
+          <dd>{{ student.student_id }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Gender</dt>
+          <dd>{{ student.gender|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Date of Birth</dt>
+          <dd>{% if student.date_of_birth %}{{ student.date_of_birth|date:"F d, Y" }}{% else %}—{% endif %}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Civil Status</dt>
+          <dd>{{ student.civil_status|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Email</dt>
+          <dd>{{ student.email|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Phone</dt>
+          <dd>{{ student.phone|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Address</dt>
+          <dd>{{ student.address|default:"—" }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Academic / Background Information -->
+    <section class="info-card">
+      <h2 class="card-title">
+        <span class="card-icon">🎓</span> Academic Background
+      </h2>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>Course</dt>
+          <dd>{{ student.course|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Year Level</dt>
+          <dd>{{ student.year_level|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Section</dt>
+          <dd>{{ student.section|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>School Year</dt>
+          <dd>{{ student.school_year|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Date Enrolled</dt>
+          <dd>{% if student.date_enrolled %}{{ student.date_enrolled|date:"F d, Y" }}{% else %}—{% endif %}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Previous School</dt>
+          <dd>{{ student.previous_school|default:"—" }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Guardian Information -->
+    <section class="info-card">
+      <h2 class="card-title">
+        <span class="card-icon">🏠</span> Guardian Information
+      </h2>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>Guardian Name</dt>
+          <dd>{{ student.guardian_name|default:"—" }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>Guardian Contact</dt>
+          <dd>{{ student.guardian_contact|default:"—" }}</dd>
+        </div>
+      </dl>
+    </section>
+
+  </div>
+</div>
+{% endblock %}

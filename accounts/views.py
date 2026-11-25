@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from .models import Student
 
 
 def login_view(request):
@@ -79,3 +80,24 @@ def logout_view(request):
 @login_required
 def home_view(request):
     return render(request, 'accounts/home.html')
+
+
+@login_required
+def student_list_view(request):
+    query = request.GET.get('q', '').strip()
+    students = Student.objects.all()
+    if query:
+        students = students.filter(
+            last_name__icontains=query
+        ) | students.filter(
+            first_name__icontains=query
+        ) | students.filter(
+            student_id__icontains=query
+        )
+    return render(request, 'accounts/student_list.html', {'students': students, 'query': query})
+
+
+@login_required
+def student_detail_view(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    return render(request, 'accounts/student_detail.html', {'student': student})

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Enrollment System{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #f5f6fa;
+      color: #111;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: #1a237e;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      height: 56px;
+    }
+    .nav-brand { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.3px; color: #fff; text-decoration: none; }
+    .nav-brand span { font-weight: 400; opacity: 0.7; font-size: 0.85rem; margin-left: 10px; }
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
+    .nav-link {
+      color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.88rem;
+      padding: 6px 14px; border-radius: 4px; transition: background 0.15s;
+    }
+    .nav-link:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .nav-link.active { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* ── WRAP ── */
+    .enroll-wrap {
+      max-width: 1100px;
+      margin: 36px auto;
+      padding: 0 24px;
+    }
+
+    /* ── HEADER ROW ── */
+    .enroll-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .enroll-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .enroll-sub { color: #666; font-size: 0.9rem; margin-top: 4px; }
+
+    /* ── SEARCH ── */
+    .search-form { display: flex; gap: 8px; }
+    .search-input {
+      padding: 10px 14px;
+      border: 1px solid #d0d0d8;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+      width: 260px;
+      background: #fff;
+    }
+    .search-input:focus { border-color: #1a237e; }
+    .search-btn {
+      padding: 10px 20px;
+      background: #1a237e; color: #fff;
+      border: none; border-radius: 6px;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .search-btn:hover { background: #283593; }
+
+    /* ── TABLE ── */
+    .student-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .student-table thead {
+      background: #1a237e;
+      color: #fff;
+    }
+    .student-table th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .student-table td {
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #f0f0f4;
+      vertical-align: middle;
+    }
+    .student-row { cursor: pointer; transition: background 0.12s; }
+    .student-row:hover { background: #eef0fb; }
+    .student-row:last-child td { border-bottom: none; }
+
+    .id-cell { font-family: monospace; font-size: 0.85rem; color: #555; }
+
+    .name-cell { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #1a237e;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .view-cell { text-align: right; }
+    .view-link { font-size: 0.82rem; font-weight: 600; color: #1a237e; }
+
+    /* ── EMPTY ── */
+    .empty-state {
+      background: #fff; border-radius: 10px;
+      padding: 60px 24px; text-align: center;
+      color: #888; font-size: 0.95rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .empty-state a { color: #1a237e; font-weight: 600; }
+
+    /* ── PROFILE DETAIL ── */
+    .back-link {
+      display: inline-block; margin-bottom: 24px;
+      font-size: 0.88rem; font-weight: 600;
+      color: #1a237e; text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .profile-hero {
+      display: flex; align-items: center; gap: 24px;
+      background: #fff; border-radius: 10px;
+      padding: 28px 32px; margin-bottom: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .profile-avatar-lg {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #1a237e;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 700;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+    .profile-name { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.3px; }
+    .profile-meta { color: #666; font-size: 0.9rem; margin-top: 4px; }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .info-card {
+      background: #fff; border-radius: 10px;
+      padding: 24px 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .card-title {
+      font-size: 1rem; font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-icon { font-size: 1.1rem; }
+
+    .info-list { list-style: none; }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid #f4f4f8;
+      font-size: 0.88rem;
+      gap: 16px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row dt { color: #888; flex-shrink: 0; }
+    .info-row dd { font-weight: 500; text-align: right; word-break: break-word; }
+
+    @media (max-width: 640px) {
+      .enroll-header { flex-direction: column; align-items: flex-start; }
+      .search-form { width: 100%; }
+      .search-input { flex: 1; width: auto; }
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="{% url 'home' %}">
+    🎓 Enrollment System <span>Admin Portal</span>
+  </a>
+  <div class="nav-actions">
+    <a class="nav-link {% block nav_students %}{% endblock %}" href="{% url 'student_list' %}">Students</a>
+    <a class="nav-link" href="{% url 'logout' %}">Log out</a>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

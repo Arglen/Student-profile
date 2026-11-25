@@ -1,0 +1,59 @@
+{% extends 'accounts/enrollment_base.html' %}
+{% block title %}Students — Enrollment System{% endblock %}
+
+{% block content %}
+<div class="enroll-wrap">
+
+  <div class="enroll-header">
+    <div>
+      <h1 class="enroll-title">Student Directory</h1>
+      <p class="enroll-sub">Click any student to view their full profile.</p>
+    </div>
+    <form class="search-form" method="get" action="{% url 'student_list' %}">
+      <input class="search-input" type="text" name="q" value="{{ query }}" placeholder="Search by name or ID…">
+      <button class="search-btn" type="submit">Search</button>
+    </form>
+  </div>
+
+  {% if students %}
+  <table class="student-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Course</th>
+        <th>Year</th>
+        <th>Section</th>
+        <th>Email</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr class="student-row" onclick="window.location='{% url 'student_detail' s.pk %}'">
+        <td class="id-cell">{{ s.student_id }}</td>
+        <td class="name-cell">
+          <div class="avatar">{{ s.first_name.0 }}{{ s.last_name.0 }}</div>
+          <span>{{ s.full_name }}</span>
+        </td>
+        <td>{{ s.course|default:"—" }}</td>
+        <td>{{ s.year_level|default:"—" }}</td>
+        <td>{{ s.section|default:"—" }}</td>
+        <td>{{ s.email|default:"—" }}</td>
+        <td class="view-cell"><span class="view-link">View →</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    {% if query %}
+      <p>No students matched "<strong>{{ query }}</strong>".</p>
+    {% else %}
+      <p>No students enrolled yet. Add students via the <a href="/admin/">admin panel</a>.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
